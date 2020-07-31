@@ -28,6 +28,8 @@ public class Joguin extends ApplicationAdapter {
 	TextureRegion lagartoTexture;
 	TextureRegion backgroundAbertura;
 	TextureRegion canceladoTexture;
+	TextureRegion vitoriaTexture;
+
 
 
 
@@ -68,6 +70,9 @@ public class Joguin extends ApplicationAdapter {
 		// Carrega a o fundo principal do jogo como textura e entao usa a textura para criar uma @TextureRegion
 		Texture texture = new Texture(Gdx.files.internal("cenariouft2.png"));
 		backgroundTexture = new TextureRegion(texture, 0, 0,2048, 563);
+
+		Texture texture1 = new Texture(Gdx.files.internal("vitoria.jpg"));
+		vitoriaTexture = new TextureRegion(texture1, 0,0,1280,720);
 
 		//Carrega a imagem do camaleao que e o obstaculo principal desse joguinho merda
 		Texture texture2 = new Texture(Gdx.files.internal("camaleao.png"));
@@ -190,27 +195,33 @@ public class Joguin extends ApplicationAdapter {
 			//batch.draw(lagartoAnimation.getKeyFrame(time, true), manPosition.x, manPosition.y, 1000, 1000);
 
 			if(Gdx.app.getType() == Application.ApplicationType.Android) {
-				batch.draw(texturasPersonagens[0], 0,800,300,300);
-				batch.draw(texturasPersonagens[1], 250,800,300,300);
-				batch.draw(texturasPersonagens[2], 500,800,300,300);
-				batch.draw(texturasPersonagens[3], 750,800,300,300);
-				batch.draw(texturasPersonagens[4], 0,500,300,300);
-				batch.draw(texturasPersonagens[5], 250,500,300,300);
-				batch.draw(texturasPersonagens[6], 500,500,300,300);
-				batch.draw(texturasPersonagens[7], 750,500,300,300);
-				batch.draw(texturasPersonagens[8], 0,200,300,300);
-				batch.draw(texturasPersonagens[9], 250,200,300,300);
+
+				batch.draw(backgroundAbertura,0,0,1920,1080);
+
+				//batch.draw(texturasPersonagens[0], 0,800,400,400);
+				//batch.draw(texturasPersonagens[1], 250,800,400,400);
+				//batch.draw(texturasPersonagens[2], 500,800,300,300);
+				//batch.draw(texturasPersonagens[3], 750,800,300,300);
+				//batch.draw(texturasPersonagens[4], 0,500,300,300);
+				//batch.draw(texturasPersonagens[5], 250,500,300,300);
+				//batch.draw(texturasPersonagens[6], 500,500,300,300);
+				//batch.draw(texturasPersonagens[7], 750,500,300,300);
+				//batch.draw(texturasPersonagens[8], 0,200,300,300);
+				//batch.draw(texturasPersonagens[9], 250,200,300,300);
 				//A fonte e configurada e depois exibida
 				font.setColor(Color.GREEN);
 				font.getData().setScale(1.5f,1.5f);
 
 
+
 				font.getData().setScale(2,2);
-				font.draw(batch,"NAO PISE NO \nLAGARTO OU VOCE \nSERA CANCELADO \nPELOS DEFENSORES \nDOS ANIMAIS",30,1800);
-				font.draw(batch,"ESCOLHA UM \nPERSONAGEM",20, 1300);
+				font.draw(batch,"NAO PISE NO \nLAGARTO OU VOCE \nSERA CANCELADO \nPELOS DEFENSORES \nDOS ANIMAIS",30,800);
+				//font.draw(batch,"ESCOLHA UM \nPERSONAGEM",20, 300);
 
 			}
 			else {
+				batch.draw(backgroundAbertura,0,0,1668,2000);
+
 				batch.draw(texturasPersonagens[0], 0, 250, 50, 50);
 				font.draw(batch,"1",50,280);
 				batch.draw(texturasPersonagens[1], 100, 250, 50, 50);
@@ -298,9 +309,11 @@ public class Joguin extends ApplicationAdapter {
 					//camera.setToOrtho(true);
 					configureCamera();
 
-					System.out.println(touchPoint.x+" - "+touchPoint.y);
-
+					estadoJogo = DURANTE_JOGO;
+					setWalkAnimation(personagemAtual);
 					//Percorre todos os icones de personagens e checa se algum deles foi tocado
+
+					/*
 					for (int i = 0; i < 10; i++) {
 						if(temp[i].getBoundingRectangle().contains( touchPoint.x, touchPoint.y)){
 							personagemAtual = i;
@@ -310,6 +323,8 @@ public class Joguin extends ApplicationAdapter {
 							break;
 						}
 					}
+
+					 */
 					return false;
 				}
 
@@ -445,10 +460,29 @@ public class Joguin extends ApplicationAdapter {
 		}
 		else if (estadoJogo.equals(GANHOU_JOGO)){
 
-		    //A tela e limpa e a camera atualizada
+			//A tela e limpa e a camera atualizada
 			Gdx.gl.glClearColor(1, 1, 1, 1);
 			Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 			camera.update();
+
+			//O batch e inicializado, e utilizado para desenhar a imagem de perdedor e a fonte com as instrucoes para recomecar
+			batchEstatico.begin();
+
+
+			batchEstatico.draw(vitoriaTexture,0,0,2000,1000);
+			font.getData().setScale(2);
+			font.draw(batchEstatico,"GANHOU \nGANHOU\n\n\nNada \nna \nverdade",20,200);
+
+			//O batch e finalizado
+			batchEstatico.end();
+
+			//Se o jogador clica na tela, o jogo reinicia
+			if (Gdx.input.isTouched()){
+				estadoJogo = DURANTE_JOGO;
+				personagemAtual++;
+				setWalkAnimation(personagemAtual);
+				resetGame();
+			}
 
 		}
 		else if(estadoJogo.equals(PERDEU_JOGO)){
@@ -466,8 +500,8 @@ public class Joguin extends ApplicationAdapter {
 
 				batchEstatico.draw(canceladoTexture,0,100,1500,1000);
 
-				font.getData().setScale(2);
-				font.draw(batchEstatico,"PERDEU \nPERDEU\n\n\nToque \npara \nrecomecar",20,1500);
+				font.getData().setScale(1.5f);
+				font.draw(batchEstatico,"PERDEU \nPERDEU\n\n\nToque \npara \nrecomecar",20,400);
 
 			}
 			else{
@@ -482,7 +516,8 @@ public class Joguin extends ApplicationAdapter {
 			//Se o jogador clica na tela, o jogo reinicia
 			if (Gdx.input.isTouched()){
 				estadoJogo = DURANTE_JOGO;
-				personagemAtual = personagemAtual == 10 ? 0 : personagemAtual+1;
+				personagemAtual = personagemAtual == 9 ? 0 : personagemAtual+1;
+				setWalkAnimation(personagemAtual);
 				resetGame();
 			}
 		}
