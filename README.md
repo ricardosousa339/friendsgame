@@ -17,7 +17,7 @@ Como é desenvolvido em java, o jogo necessita apenas do java instalado, quando 
 
 Basta baixar o apk, fornecer as permissões necessárias para sua instalação e então abri-lo e clicar em instalar.
 
-<img src="Screenshot_20200729-011102.png" width="160" height="320"> <img src="Screenshot_20200729-011109.png" width="160" height="320">
+<img src="https://ibb.co/dmNxPjc" width="600" height="320">
 
 //Colocar o link do apk
 
